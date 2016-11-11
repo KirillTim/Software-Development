@@ -18,10 +18,10 @@ class AddProductServlet(val dataBase: ProductDB) : HttpServlet() {
         val price = req?.getParameter(PRICE_PARAM)
         var errorMsg = ""
         if (name == null || name.isEmpty()) {
-            errorMsg += "name argument is required\n"
+            errorMsg += "$NAME_PARAM parameter is required\n"
         }
         if (price == null || price.isEmpty()) {
-            errorMsg += "name argument is required\n"
+            errorMsg += "$PRICE_PARAM parameter is required\n"
         }
         var responseStatus = HttpServletResponse.SC_BAD_REQUEST
         if (errorMsg.isEmpty()) {
