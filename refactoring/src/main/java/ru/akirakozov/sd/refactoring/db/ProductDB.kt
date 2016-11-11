@@ -17,8 +17,8 @@ class ProductDB(private val connection: Connection) {
     init {
         val CREATE_QUERY = "CREATE TABLE IF NOT EXISTS $TABLE_NAME" +
                 "(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-                " $NAME_COLUMN TEXT NOT NULL, $PRICE_COLUMN INT  NOT NULL)"
-        val stmt = connection.createStatement();
+                " $NAME_COLUMN TEXT NOT NULL, $PRICE_COLUMN INT NOT NULL)"
+        val stmt = connection.createStatement()
         stmt.executeUpdate(CREATE_QUERY)
         stmt.close()
     }
