@@ -14,18 +14,27 @@ class ProductDB(private val connection: Connection) {
     private val PRICE_COLUMN = "price"
     private val TABLE_NAME = "product"
 
+    init {
+        val CREATE_QUERY = "CREATE TABLE IF NOT EXISTS $TABLE_NAME" +
+                "(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                " $NAME_COLUMN TEXT NOT NULL, $PRICE_COLUMN INT  NOT NULL)"
+        val stmt = connection.createStatement();
+        stmt.executeUpdate(CREATE_QUERY)
+        stmt.close()
+    }
+
     fun addProduct(product: Product) {
-        val INSERT_STATEMENT = "INSERT INTO $TABLE_NAME ($NAME_COLUMN, $PRICE_COLUMN) " +
+        val INSERT_QUERY = "INSERT INTO $TABLE_NAME ($NAME_COLUMN, $PRICE_COLUMN) " +
                 "VALUES (\"${product.name}\", ${product.price})"
         val stmt = connection.createStatement()
-        stmt.executeUpdate(INSERT_STATEMENT)
+        stmt.executeUpdate(INSERT_QUERY)
         stmt.close()
     }
 
     fun getProducts(): List<Product> {
-        val GET_STATEMENT = "SELECT * FROM $TABLE_NAME"
+        val GET_QUERY = "SELECT * FROM $TABLE_NAME"
         val stmt = connection.createStatement()
-        val resultSet = stmt.executeQuery(GET_STATEMENT)
+        val resultSet = stmt.executeQuery(GET_QUERY)
         val products = mutableListOf<Product>()
         while (resultSet.next()) {
             products += resultSetToProduct(resultSet)
