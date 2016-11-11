@@ -25,8 +25,8 @@ fun main(args: Array<String>) {
     server.handler = context
 
     context.addServlet(ServletHolder(AddProductServlet(productDB)), "/add-product")
-    context.addServlet(ServletHolder(GetProductsServlet()), "/get-products")
-    context.addServlet(ServletHolder(QueryServlet()), "/query")
+    context.addServlet(ServletHolder(GetProductsServlet(productDB)), "/get-products")
+    context.addServlet(ServletHolder(QueryServlet(productDB)), "/query")
 
     server.start()
     server.join()

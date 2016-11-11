@@ -17,6 +17,7 @@ class AddProductServlet(val dataBase: ProductDB) : HttpServlet() {
         val name = req?.getParameter(NAME_PARAM)
         val price = req?.getParameter(PRICE_PARAM)
         var errorMsg = ""
+        resp?.contentType = "text/html"
         if (name == null || name.isEmpty()) {
             errorMsg += "$NAME_PARAM parameter is required\n"
         }
@@ -29,18 +30,17 @@ class AddProductServlet(val dataBase: ProductDB) : HttpServlet() {
                 val priceInt = price!!.toInt()
                 try {
                     dataBase.addProduct(Product(name!!, priceInt))
-                    responseStatus = HttpServletResponse.SC_OK
+                    resp?.status = HttpServletResponse.SC_OK
+                    resp?.writer?.println("OK")
+                    return
                 } catch (ex: Exception) {
                     responseStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
-                    errorMsg = "database error"
                 }
             } catch (ex: NumberFormatException) {
                 errorMsg = "price must be integer\n"
             }
         }
-
         resp?.status = responseStatus
-        resp?.contentType = "text/html"
-        resp?.writer?.println(if (errorMsg.isNotEmpty()) errorMsg else "OK")
+        resp?.writer?.println(errorMsg)
     }
 }
