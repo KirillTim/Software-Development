@@ -12,29 +12,31 @@ import javax.servlet.http.HttpServletResponse
 class QueryServlet(val dataBase: ProductDB) : HttpServlet() {
     val COMMAND_PARAM = "command"
     val resolvers = mapOf(
-            Pair("max", {
+            "max" to {
                 val resp = dataBase.getMaxPrice()?.toString()
                 if (resp != null) "<h1>Product with max price: </h1>\n$resp" else "No products in database"
-            }),
-            Pair("min", {
+            },
+            "min" to {
                 val resp = dataBase.getMinPrice()?.toString()
                 if (resp != null) "<h1>Product with max price: </h1>\n$resp" else "No products in database"
-            }),
-            Pair("sum", {
+            },
+            "sum" to {
                 val resp = dataBase.getPricesSum()
                 if (resp != null) "Summary price: $resp" else "Can't calculate sum"
-            }),
-            Pair("count", {
+            },
+            "count" to {
                 val resp = dataBase.getProductsCount()
                 if (resp != null) "Number of products: $resp" else "Can't count products"
-            })
+            }
     )
 
     override fun doGet(req: HttpServletRequest?, resp: HttpServletResponse?) {
-        val cmd = req?.getParameter(COMMAND_PARAM)
-        var responseStatus = HttpServletResponse.SC_BAD_REQUEST
+        req ?: return
+        resp ?: return
+
+        val cmd = req.getParameter(COMMAND_PARAM)
         var errorMsg = ""
-        resp?.contentType = "text/html"
+        resp.contentType = "text/html"
         if (cmd == null) {
             errorMsg = "$COMMAND_PARAM is required"
         } else {
@@ -42,16 +44,12 @@ class QueryServlet(val dataBase: ProductDB) : HttpServlet() {
             if (operation == null) {
                 errorMsg = "unknown command: $cmd"
             } else {
-                try {
-                    resp?.writer?.println(HtmlPage(operation()).generate())
-                    resp?.status = HttpServletResponse.SC_OK
-                    return
-                } catch (ex: Exception) {
-                    responseStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
-                }
+                resp.writer?.println(HtmlPage(operation()).generate())
+                resp.status = HttpServletResponse.SC_OK
+                return
             }
         }
-        resp?.writer?.println(errorMsg)
-        resp?.status = responseStatus
+        resp.status = HttpServletResponse.SC_BAD_REQUEST
+        resp.writer?.println(errorMsg)
     }
 }

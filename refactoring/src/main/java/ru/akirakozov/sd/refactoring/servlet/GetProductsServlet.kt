@@ -11,13 +11,12 @@ import javax.servlet.http.HttpServletResponse
  */
 class GetProductsServlet(val dataBase: ProductDB) : HttpServlet() {
     override fun doGet(req: HttpServletRequest?, resp: HttpServletResponse?) {
-        resp?.contentType = "text/html"
-        try {
-            val page = ListHtmlPage(list = dataBase.getProducts().map { it.toString() })
-            resp?.writer?.println(page.generate())
-            resp?.status = HttpServletResponse.SC_OK
-        } catch (ex: Exception) {
-            resp?.status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
-        }
+        req ?: return
+        resp ?: return
+
+        val page = ListHtmlPage(list = dataBase.getProducts().map { it.toString() })
+        resp.contentType = "text/html"
+        resp.status = HttpServletResponse.SC_OK
+        resp.writer?.println(page.generate())
     }
 }
