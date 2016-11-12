@@ -24,7 +24,8 @@ class LRUCache<in K, V>(private val cacheSize: Int = 10) : Cache<K, V> {
 
     private val map = mutableMapOf<K, Node<K, V>>()
 
-    @Synchronized override fun get(key: K): V? {
+    @Synchronized
+    override fun get(key: K): V? {
         val node = map[key]
         if (node != null) {
             assert(head != null)
@@ -58,7 +59,8 @@ class LRUCache<in K, V>(private val cacheSize: Int = 10) : Cache<K, V> {
         head = node
     }
 
-    @Synchronized override fun put(key: K, value: V): V? {
+    @Synchronized
+    override fun put(key: K, value: V): V? {
         val oldNode = map[key]
 
         if (oldNode != null) {
