@@ -38,7 +38,7 @@ class LRUCache<in K, V>(private val cacheSize: Int = 10) : Cache<K, V> {
     }
 
     private fun update(node: Node<K, V>) {
-        assert(isNotEmpty())
+        assert(isNotEmpty(), {"Can't update empty list"})
         if (node == head) {
             return
         }
@@ -77,7 +77,7 @@ class LRUCache<in K, V>(private val cacheSize: Int = 10) : Cache<K, V> {
 
         if (size() == cacheSize) {
             if (head == tail) {
-                assert(cacheSize == 1)
+                assert(cacheSize == 1, {"Broken list structure"})
                 head = null
                 tail = null
                 map.clear()
