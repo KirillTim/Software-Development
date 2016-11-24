@@ -22,10 +22,10 @@ import java.util.Date
 data class Tweet(val text: String, val createdAt: Date)
 
 interface TwitterSearch {
-    fun requestTweets(hashTag: String, hours: Int): List<Tweet>
+    fun requestTweets(hashTag: String, from: Date, hours: Int): List<Tweet>
 }
 
-class TwitterSearchImpl(host: String, val oauth: OAuthProperties) : TwitterSearch {
+class TwitterSearchImpl(host: String, private val oauth: OAuthProperties) : TwitterSearch {
 
     private val DATE_FORMAT = SimpleDateFormat("EEE MMM dd HH:mm:ss +0000 yyyy")
 
@@ -36,10 +36,10 @@ class TwitterSearchImpl(host: String, val oauth: OAuthProperties) : TwitterSearc
             .build()
             .create(TwitterApi::class.java)
 
-    override fun requestTweets(hashTag: String, hours: Int): List<Tweet> {
-        fun getStartTime(endTime: Date, hours: Int): Date {
+    override fun requestTweets(hashTag: String, from: Date, hours: Int): List<Tweet> {
+        fun pastHourFromTime(nowTime: Date, hours: Int): Date {
             val cal = Calendar.getInstance()
-            cal.time = endTime
+            cal.time = nowTime
             cal.add(Calendar.HOUR_OF_DAY, -1 * hours)
             return cal.time
         }
@@ -47,8 +47,8 @@ class TwitterSearchImpl(host: String, val oauth: OAuthProperties) : TwitterSearc
         if (!isCorrectHashTag(hashTag))
             throw IllegalHashTagException(hashTag)
 
-        val endTime = Date()
-        val startTime = getStartTime(endTime, hours)
+        val endTime = from
+        val startTime = pastHourFromTime(endTime, hours)
 
         val result = mutableListOf<Tweet>()
         var maxId: Long? = null
@@ -92,9 +92,9 @@ fun isCorrectHashTag(hashTag: String): Boolean {
     return word.filter(Char::isLetterOrDigit) == word
 }
 
-data class TweetEntry(@SerializedName("created_at") val createdAt: String,
-                 @SerializedName("id") val id: Long,
-                 @SerializedName("text") val text: String)
+private data class TweetEntry(@SerializedName("created_at") val createdAt: String,
+                              @SerializedName("id") val id: Long,
+                              @SerializedName("text") val text: String)
 
 private data class TweetsTimeLine(@SerializedName("statuses") val tweets: List<TweetEntry>)
 

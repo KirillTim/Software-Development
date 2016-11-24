@@ -15,10 +15,10 @@ fun main(args: Array<String>) {
             properties.getProperty("token"),
             properties.getProperty("token.secret"))
 
-    val twt = TwitterSearchImpl("https://api.twitter.com/", oauth).requestTweets("#kotlin", 10)
-    println("feed size = ${twt.size}")
-    twt.map(::println)
-
+    val twt = TwitterSearchImpl("https://api.twitter.com/", oauth)
+    val manager = TwitterSearchManager(twt)
+    val ans = manager.lastHoursTweets("#kotlin", 10)
+    ans.forEachIndexed { hour, count -> println("$hour : $count") }
 }
 
 
