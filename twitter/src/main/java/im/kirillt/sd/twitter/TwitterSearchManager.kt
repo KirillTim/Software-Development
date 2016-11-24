@@ -1,6 +1,6 @@
 package im.kirillt.sd.twitter
 
-import java.util.*
+import java.util.Date
 import java.util.concurrent.TimeUnit
 
 /**
