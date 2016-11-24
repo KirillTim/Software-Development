@@ -1,6 +1,6 @@
 package im.kirillt.sd.twitter
 
-import java.util.Properties
+import java.util.*
 
 /**
  * @author Kirill
@@ -15,8 +15,10 @@ fun main(args: Array<String>) {
             properties.getProperty("token"),
             properties.getProperty("token.secret"))
 
-    val twt = TwitterSearchImpl("https://api.twitter.com/", oauth).requestTweets("pepe", 24)
+    val twt = TwitterSearchImpl("https://api.twitter.com/", oauth).requestTweets("#kotlin", 10)
+    println("feed size = ${twt.size}")
     twt.map(::println)
+
 }
 
 

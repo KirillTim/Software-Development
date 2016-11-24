@@ -12,13 +12,14 @@ import se.akerfeldt.okhttp.signpost.OkHttpOAuthConsumer
 import se.akerfeldt.okhttp.signpost.SigningInterceptor
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 /**
  * @author Kirill
  */
 
-data class ResultTweet(val text: String, val createdAt: Date)
+data class Tweet(val text: String, val createdAt: Date)
 
 interface TwitterSearch {
     fun requestTweets(hashTag: String, hours: Int): List<Tweet>
@@ -36,11 +37,32 @@ class TwitterSearchImpl(host: String, val oauth: OAuthProperties) : TwitterSearc
             .create(TwitterApi::class.java)
 
     override fun requestTweets(hashTag: String, hours: Int): List<Tweet> {
-        //throw UnsupportedOperationException("not implemented")
-        val response = twitterApi.search(hashTag).execute()
-        if (!response.isSuccessful)
-            throw IOException("response code = ${response.code()}")
-        return response.body()?.tweets ?: throw Exception("body is null")
+        fun getStartTime(endTime: Date, hours: Int): Date {
+            val cal = Calendar.getInstance()
+            cal.time = endTime
+            cal.add(Calendar.HOUR_OF_DAY, -1 * hours)
+            return cal.time
+        }
+
+        if (!isCorrectHashTag(hashTag))
+            throw IllegalHashTagException(hashTag)
+
+        val endTime = Date()
+        val startTime = getStartTime(endTime, hours)
+
+        val result = mutableListOf<Tweet>()
+        var maxId: Long? = null
+        while (true) {
+            val response = twitterApi.search(hashTag, maxId.toString()).execute()
+            if (!response.isSuccessful)
+                throw TwitterSearchException(response.code())
+            val inTime = response.body().tweets.filter { isBetween(DATE_FORMAT.parse(it.createdAt), startTime, endTime) }
+            result += inTime.map { Tweet(it.text, DATE_FORMAT.parse(it.createdAt)) }
+            if (inTime.isEmpty())
+                break
+            maxId = inTime.map { it.id }.min()!! - 1
+        }
+        return result
     }
 
     private fun makeHttpClient(): OkHttpClient {
@@ -54,9 +76,8 @@ class TwitterSearchImpl(host: String, val oauth: OAuthProperties) : TwitterSearc
                 .build()
     }
 
+    private fun isBetween(time: Date, start: Date, end: Date) = time >= start && time <= end
 }
-
-data class OAuthProperties(val key: String, val secret: String, val token: String, val tokenSecret: String)
 
 private interface TwitterApi {
     @GET("/1.1/search/tweets.json?result_type=mixed&include_entities=0")
@@ -64,8 +85,21 @@ private interface TwitterApi {
                @Query("count") count: Int = 100): Call<TweetsTimeLine>
 }
 
-data class Tweet(@SerializedName("created_at") val createdAt: String,
-                 @SerializedName("id_str") val strId: String,
+fun isCorrectHashTag(hashTag: String): Boolean {
+    if (hashTag.length < 2 || !hashTag.startsWith("#"))
+        return false
+    val word = hashTag.substring(1)
+    return word.filter(Char::isLetterOrDigit) == word
+}
+
+data class TweetEntry(@SerializedName("created_at") val createdAt: String,
+                 @SerializedName("id") val id: Long,
                  @SerializedName("text") val text: String)
 
-private data class TweetsTimeLine(@SerializedName("statuses") val tweets: List<Tweet>)
+private data class TweetsTimeLine(@SerializedName("statuses") val tweets: List<TweetEntry>)
+
+class TwitterSearchException(val responseCode: Int) : IOException("Search response failed with code $responseCode")
+
+class IllegalHashTagException(val hashTag: String) : IllegalArgumentException("Illegal hashtag: $hashTag")
+
+data class OAuthProperties(val key: String, val secret: String, val token: String, val tokenSecret: String)
