@@ -16,8 +16,8 @@ open class DrawableVertexesGraph<out T>(val vertexes: List<T>, api: DrawingApi) 
 
     protected val vertexCoordinates = vertexes.mapIndexed {
         i, v ->
-        val x = centerX + circleRadius * Math.cos(phi * i);
-        val y = centerY + circleRadius * Math.sin(phi * i);
+        val x = centerX + circleRadius * Math.cos(phi * i)
+        val y = centerY + circleRadius * Math.sin(phi * i)
         VertexCoordinate(x, y, circleRadius * 0.2)
     }
 
