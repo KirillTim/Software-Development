@@ -1,6 +1,6 @@
 package im.kirillt.sd.twitter
 
-import java.util.Properties
+import java.util.*
 
 /**
  * @author Kirill
@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
             properties.getProperty("token.secret"))
 
     val manager = TwitterSearchManager(TwitterSearchImpl(HOST, oauth))
-    val ans = manager.lastHoursTweets("#kotlin", 10)
+    val ans = manager.lastHoursTweets("#kotlin", Date(), 10)
     ans.forEachIndexed { hour, count -> println("$hour : $count") }
 }
 

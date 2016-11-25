@@ -8,8 +8,8 @@ import java.util.concurrent.TimeUnit
  */
 
 class TwitterSearchManager(private val client: TwitterSearch) {
-    fun lastHoursTweets(hashTag: String, hours: Int): List<Int> {
-        val now = Date()
+    fun lastHoursTweets(hashTag: String, from: Date, hours: Int): List<Int> {
+        val now = from
         val feed = client.requestTweets(hashTag, now, hours)
         val countByHours = IntArray(hours)
 
