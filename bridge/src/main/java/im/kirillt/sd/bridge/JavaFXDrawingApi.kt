@@ -5,6 +5,7 @@ import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.layout.StackPane
+import javafx.scene.paint.Color
 import javafx.stage.Stage
 
 /**
@@ -12,10 +13,16 @@ import javafx.stage.Stage
  */
 class JavaFXDrawingApi() : Application(), DrawingApi {
     companion object {
+        fun initGraphicsContext(): GraphicsContext {
+            val gc = canvas.graphicsContext2D
+            gc.fill = Color.WHITE
+            return gc
+        }
+
         val width = 400
         val height = 400
         val canvas = Canvas(width.toDouble(), height.toDouble())
-        val graphicsContext: GraphicsContext = canvas.graphicsContext2D
+        val graphicsContext = initGraphicsContext()
     }
 
     override val areaWidth = width
@@ -32,8 +39,10 @@ class JavaFXDrawingApi() : Application(), DrawingApi {
     override fun drawLine(x1: Double, y1: Double, x2: Double, y2: Double)
             = graphicsContext.strokeLine(x1, y1, x2, y2)
 
-    override fun drawCircle(x: Double, y: Double, radius: Double)
-            = graphicsContext.strokeOval(x, y, radius * 2, radius * 2)
+    override fun drawCircle(x: Double, y: Double, radius: Double) {
+        graphicsContext.fillOval(x - radius, y - radius, radius * 2, radius * 2)
+        graphicsContext.strokeOval(x - radius, y - radius, radius * 2, radius * 2)
+    }
 
     override fun drawText(text: String, x: Double, y: Double)
             = graphicsContext.strokeText(text, x, y)
