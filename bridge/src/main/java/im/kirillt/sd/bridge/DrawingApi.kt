@@ -3,14 +3,18 @@ package im.kirillt.sd.bridge
 /**
  * @author Kirill
  */
-abstract class DrawingApi(val areaWidth: Int, val areaHeight: Int) {
-    abstract fun drawLine(from: Point, to: Point)
+interface DrawingApi {
 
-    abstract fun drawCircle(center: Point)
+    val areaWidth: Int
+    val areaHeight: Int
 
-    abstract fun drawText(text: String, at: Point, fontSize: Int)
+    fun drawLine(from: Point, to: Point)
 
-    abstract fun render()
+    fun drawCircle(center: Point, radius: Double)
+
+    fun drawText(text: String, at: Point)
+
+    fun render()
 
     data class Point(val x: Double, val y: Double)
 }
