@@ -92,11 +92,11 @@ fun isCorrectHashTag(hashTag: String): Boolean {
     return word.filter(Char::isLetterOrDigit) == word
 }
 
-private data class TweetEntry(@SerializedName("created_at") val createdAt: String,
+data class TweetEntry(@SerializedName("created_at") val createdAt: String,
                               @SerializedName("id") val id: Long,
                               @SerializedName("text") val text: String)
 
-private data class TweetsTimeLine(@SerializedName("statuses") val tweets: List<TweetEntry>)
+data class TweetsTimeLine(@SerializedName("statuses") val tweets: List<TweetEntry>)
 
 class TwitterSearchException(val responseCode: Int) : IOException("Search response failed with code $responseCode")
 
