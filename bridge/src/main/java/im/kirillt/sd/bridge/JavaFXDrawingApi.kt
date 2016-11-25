@@ -1,7 +1,6 @@
 package im.kirillt.sd.bridge
 
 import javafx.application.Application
-import im.kirillt.sd.bridge.DrawingApi.Point
 import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
 import javafx.scene.layout.StackPane
@@ -20,18 +19,19 @@ class JavaFXDrawingApi(width: Int, height: Int) : Application(), DrawingApi {
     override fun start(primaryStage: Stage) {
         val root = StackPane()
         root.children.add(canvas)
+        graphicsContext.lineWidth = 2.0
         primaryStage.scene = Scene(root)
         primaryStage.show()
     }
 
-    override fun drawLine(from: Point, to: Point)
-            = graphicsContext.strokeLine(from.x, from.y, to.x, to.y)
+    override fun drawLine(x1: Double, y1: Double, x2: Double, y2: Double)
+            = graphicsContext.strokeLine(x1, y1, x2, y2)
 
-    override fun drawCircle(center: Point, radius: Double)
-            = graphicsContext.strokeOval(center.x, center.y, radius, radius)
+    override fun drawCircle(x: Double, y: Double, radius: Double)
+            = graphicsContext.strokeOval(x, y, radius, radius)
 
-    override fun drawText(text: String, at: Point)
-            = graphicsContext.strokeText(text, at.x, at.y)
+    override fun drawText(text: String, x: Double, y: Double)
+            = graphicsContext.strokeText(text, x, y)
 
     override fun render() = Application.launch()
 }

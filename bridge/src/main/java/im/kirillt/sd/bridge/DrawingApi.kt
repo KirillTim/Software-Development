@@ -8,13 +8,11 @@ interface DrawingApi {
     val areaWidth: Int
     val areaHeight: Int
 
-    fun drawLine(from: Point, to: Point)
+    fun drawLine(x1: Double, y1 : Double, x2: Double, y2 : Double)
 
-    fun drawCircle(center: Point, radius: Double)
+    fun drawCircle(x: Double, y : Double, radius: Double)
 
-    fun drawText(text: String, at: Point)
+    fun drawText(text: String, x: Double, y : Double)
 
     fun render()
-
-    data class Point(val x: Double, val y: Double)
 }
