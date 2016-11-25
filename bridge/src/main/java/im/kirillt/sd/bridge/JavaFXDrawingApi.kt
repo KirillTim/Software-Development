@@ -3,15 +3,20 @@ package im.kirillt.sd.bridge
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
+import javafx.scene.canvas.GraphicsContext
 import javafx.scene.layout.StackPane
 import javafx.stage.Stage
 
 /**
  * @author Kirill
  */
-class JavaFXDrawingApi(width: Int, height: Int) : Application(), DrawingApi {
-    private val canvas = Canvas(width.toDouble(), height.toDouble())
-    private val graphicsContext = canvas.graphicsContext2D
+class JavaFXDrawingApi() : Application(), DrawingApi {
+    companion object {
+        val width = 400
+        val height = 400
+        val canvas = Canvas(width.toDouble(), height.toDouble())
+        val graphicsContext: GraphicsContext = canvas.graphicsContext2D
+    }
 
     override val areaWidth = width
     override val areaHeight = height
@@ -19,8 +24,8 @@ class JavaFXDrawingApi(width: Int, height: Int) : Application(), DrawingApi {
     override fun start(primaryStage: Stage) {
         val root = StackPane()
         root.children.add(canvas)
-        graphicsContext.lineWidth = 2.0
         primaryStage.scene = Scene(root)
+        primaryStage.title = "JavaFX Drawing Api"
         primaryStage.show()
     }
 
@@ -28,7 +33,7 @@ class JavaFXDrawingApi(width: Int, height: Int) : Application(), DrawingApi {
             = graphicsContext.strokeLine(x1, y1, x2, y2)
 
     override fun drawCircle(x: Double, y: Double, radius: Double)
-            = graphicsContext.strokeOval(x, y, radius, radius)
+            = graphicsContext.strokeOval(x, y, radius * 2, radius * 2)
 
     override fun drawText(text: String, x: Double, y: Double)
             = graphicsContext.strokeText(text, x, y)

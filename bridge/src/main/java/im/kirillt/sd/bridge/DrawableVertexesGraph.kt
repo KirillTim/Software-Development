@@ -5,7 +5,8 @@ package im.kirillt.sd.bridge
  */
 
 abstract class DrawableGraph(protected val drawingApi: DrawingApi) {
-    abstract fun draw(): Unit
+    abstract fun draw()
+    abstract fun render()
 }
 
 open class DrawableVertexesGraph<out T>(val vertexes: List<T>, api: DrawingApi) : DrawableGraph(api) {
@@ -18,15 +19,20 @@ open class DrawableVertexesGraph<out T>(val vertexes: List<T>, api: DrawingApi) 
         i, v ->
         val x = centerX + circleRadius * Math.cos(phi * i)
         val y = centerY + circleRadius * Math.sin(phi * i)
-        VertexCoordinate(x, y, circleRadius * 0.2)
+        VertexCoordinate(x, y, circleRadius * 0.1)
     }
 
     override fun draw() {
         vertexCoordinates.zip(vertexes).map {
             val (point, label) = it
             drawingApi.drawCircle(point.x, point.y, point.r)
-            drawingApi.drawText(label.toString(), point.x, point.y)
+            drawingApi.drawText(label.toString(), point.x + point.r, point.y + point.r )
         }
+    }
+
+    override fun render() {
+        draw()
+        drawingApi.render()
     }
 
     protected data class VertexCoordinate(val x: Double, val y: Double, val r: Double)
