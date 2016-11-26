@@ -50,19 +50,19 @@ class TwitterSearchImpl(host: String, private val oauth: OAuthProperties) : Twit
         val endTime = from
         val startTime = pastHourFromTime(endTime, hours)
 
-        val result = mutableListOf<Tweet>()
+        val result = mutableListOf<TweetEntry>()
         var maxId: Long? = null
         while (true) {
             val response = twitterApi.search(hashTag, maxId.toString()).execute()
             if (!response.isSuccessful)
                 throw TwitterSearchException(response.code())
             val inTime = response.body().tweets.filter { isBetween(DATE_FORMAT.parse(it.createdAt), startTime, endTime) }
-            result += inTime.map { Tweet(it.text, DATE_FORMAT.parse(it.createdAt)) }
-            if (inTime.isEmpty())
+            if (inTime.isEmpty() || inTime.any { result.contains(it) })
                 break
+            result += inTime
             maxId = inTime.map { it.id }.min()!! - 1
         }
-        return result
+        return result.map { Tweet(it.text, DATE_FORMAT.parse(it.createdAt)) }
     }
 
     private fun makeHttpClient(): OkHttpClient {

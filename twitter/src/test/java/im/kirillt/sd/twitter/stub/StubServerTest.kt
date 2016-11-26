@@ -28,6 +28,18 @@ class StubServerTest {
     private val DATE_FORMAT = SimpleDateFormat("EEE MMM dd HH:mm:ss +0000 yyyy")
 
     @Test
+    fun requestTweetsEmpty() {
+        withStubServer(PORT, { s ->
+            val now = Date()
+            whenHttp(s)
+                    .match(startsWithUri("/1.1/search/"))
+                    .then(stringContent(Gson().toJson(TweetsTimeLine(emptyList()))))
+            val getTweets = client.requestTweets("#tag", now, 24)
+            Assert.assertTrue(getTweets.isEmpty())
+        })
+    }
+
+    @Test
     fun requestTweets() {
         withStubServer(PORT, { s ->
             val now = Date()
@@ -35,13 +47,12 @@ class StubServerTest {
 
             whenHttp(s)
                     .match(startsWithUri("/1.1/search/"))
-                    .then(stringContent(Gson().toJson(TweetsTimeLine(emptyList()))))
+                    .then(stringContent(Gson().toJson(tweets)))
 
             val getTweets = client.requestTweets("#tag", now, 24)
-            Assert.assertTrue(getTweets.isEmpty())
-            //Assert.assertTrue(getTweets.size == 1)
-            //Assert.assertEquals("text", getTweets[0].text)
-            //Assert.assertEquals(now, getTweets[0].createdAt)
+            Assert.assertTrue(getTweets.size == 1)
+            Assert.assertEquals("text", getTweets[0].text)
+            Assert.assertEquals("$now", "${getTweets[0].createdAt}")
         })
     }
 
