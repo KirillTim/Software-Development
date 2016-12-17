@@ -3,7 +3,6 @@ package im.kirillt.sd.bridge
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
-import javafx.scene.canvas.GraphicsContext
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.stage.Stage
@@ -13,16 +12,10 @@ import javafx.stage.Stage
  */
 class JavaFXDrawingApi() : Application(), DrawingApi {
     companion object {
-        fun initGraphicsContext(): GraphicsContext {
-            val gc = canvas.graphicsContext2D
-            gc.fill = Color.WHITE
-            return gc
-        }
-
         val width = 400
         val height = 400
         val canvas = Canvas(width.toDouble(), height.toDouble())
-        val graphicsContext = initGraphicsContext()
+        val graphicsContext = canvas.graphicsContext2D
     }
 
     override val areaWidth = width
@@ -40,6 +33,7 @@ class JavaFXDrawingApi() : Application(), DrawingApi {
             = graphicsContext.strokeLine(x1, y1, x2, y2)
 
     override fun drawCircle(x: Double, y: Double, radius: Double) {
+        graphicsContext.fill = Color.WHITE
         graphicsContext.fillOval(x - radius, y - radius, radius * 2, radius * 2)
         graphicsContext.strokeOval(x - radius, y - radius, radius * 2, radius * 2)
     }

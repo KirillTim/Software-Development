@@ -3,7 +3,6 @@ package im.kirillt.sd.bridge
 /**
  * @author Kirill
  */
-
 abstract class DrawableGraph(protected val drawingApi: DrawingApi) {
     abstract fun draw()
     abstract fun render()
