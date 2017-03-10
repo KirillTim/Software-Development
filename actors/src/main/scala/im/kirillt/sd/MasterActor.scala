@@ -19,10 +19,15 @@ class MasterActor(engineResponseTimeout: Timeout) extends Actor with ActorLoggin
   override def receive: Receive = {
     case request@SearchRequest(query) =>
       log.info(s"get $query")
-      val children = SearchEngine.values.map(e => context.actorOf(ChildActor.props(e))).toList
-      val result = children map (c => c ? request) map (f => f.mapTo[ChildActorResponse])
-      val resultList = Future.sequence(result).map(list => list.map(charesp => (charesp.engine, charesp.links)).toMap)
-      val resp = resultList.map(MasterActorResponse)
+      val children = SearchEngine.values.toList.map(e => context.actorOf(ChildActor.props(e)))
+      val listOfFutures = children.map(_ ? request).map(_.mapTo[ChildActorResponseSuccess])
+        .map(_.recover { case _ => ChildActorResponseFailed() })
+
+      val result = Future.sequence(listOfFutures).map(_.map {
+        case ChildActorResponseFailed() => List()
+        case ChildActorResponseSuccess(links, engine) => links.map((engine, _))
+      })
+      val resp = result.map(_.flatten).map(MasterActorResponse2)
       resp.onComplete {
         case Success(s) => context stop self
         case Failure(e) => context stop self
