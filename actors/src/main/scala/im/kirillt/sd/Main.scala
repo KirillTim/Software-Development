@@ -9,4 +9,7 @@ object Main extends App {
   val system = ActorSystem("Searcher")
   val master = system.actorOf(MasterActor.props(10 seconds))
   master ! SearchRequest("Blah")
+  Thread.sleep(10000)
+  system.stop(master)
+  //sys.exit(1)
 }

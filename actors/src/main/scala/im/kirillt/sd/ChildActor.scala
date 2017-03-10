@@ -12,6 +12,7 @@ class ChildActor(val engine: SearchEngine) extends Actor with ActorLogging {
     case SearchRequest(query) =>
       log.info(s"get $query to $engine")
       val data = StubServer.httpRequest(query, engine)
+      log.info(s"get $data from server")
       sender() ! ChildActorResponse(data, engine)
     case _ =>
       log.info("unknown message")
