@@ -32,9 +32,6 @@ class UserIOActor extends Actor {
     case MasterActorResponse(links) =>
       println("get answer from master:")
       links foreach {it => println(s"${it._1}: ${it._2}")}
-    case MasterActorResponse2(links) =>
-      println("get answer from master:")
-      links foreach(println(_))
     case _ =>
   }
 }

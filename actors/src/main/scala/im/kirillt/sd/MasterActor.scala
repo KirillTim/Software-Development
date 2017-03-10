@@ -27,7 +27,7 @@ class MasterActor(engineResponseTimeout: Timeout) extends Actor with ActorLoggin
         case ChildActorResponseFailed() => List()
         case ChildActorResponseSuccess(links, engine) => links.map((engine, _))
       })
-      val resp = result.map(_.flatten).map(MasterActorResponse2)
+      val resp = result.map(_.flatten).map(MasterActorResponse)
       resp.onComplete {
         case Success(s) => context stop self
         case Failure(e) => context stop self
