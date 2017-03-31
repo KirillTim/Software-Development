@@ -1,36 +1,37 @@
 package im.kirillt.sd.clocktest
 
-import java.time.Clock
-import java.time.LocalDateTime
+import java.time.Duration
+import java.time.Instant
 
-data class Event(val name: String)
 
 interface EventsStatistic {
-    fun incEvent(event: Event)
-    fun getEventStatistic(event: Event): Int
-    fun getAllEventsStatistic(): Map<Event, Int>
+    fun incEvent(event: String)
+    fun getEventStatistic(event: String): Double
+    fun getAllEventStatistic(): Double
     fun printStatistic()
 }
 
-class EventStatisticImpl(val clock: Clock) : EventsStatistic {
-    val eventsStorage = mutableMapOf<Event, MutableList<LocalDateTime>>()
-    override fun incEvent(event: Event) {
-        eventsStorage.getOrPut(event, { mutableListOf() }).add(LocalDateTime.now(clock))
+class EventsStatisticImpl(val clock: MyClock) : EventsStatistic {
+    private val eventsStorage = mutableMapOf<String, MutableList<Instant>>()
+    override fun incEvent(event: String) {
+        val new = eventsStorage.getOrDefault(event, mutableListOf()) + clock.now()
+        eventsStorage.put(event, new.toMutableList())
     }
 
-    override fun getEventStatistic(event: Event): Int {
-        val now = LocalDateTime.now(clock)
-        val actualEvents = eventsStorage.getOrDefault(event, mutableListOf()).filter { now.minusHours(1) < it }.toMutableList()
+    override fun getEventStatistic(event: String): Double {
+        val deadline = clock.now().minus(Duration.ofHours(1))
+        val actualEvents = eventsStorage.getOrDefault(event, mutableListOf()).filter { it.isAfter(deadline) }.toMutableList()
         eventsStorage.put(event, actualEvents)
-        return actualEvents.size
+        return actualEvents.size / 60.0
     }
 
-    override fun getAllEventsStatistic(): Map<Event, Int>
-            = eventsStorage.keys.map { it to getEventStatistic(it) }.toMap()
+    override fun getAllEventStatistic(): Double
+            = eventsStorage.keys.map(this::getEventStatistic).sum()
 
 
     override fun printStatistic() {
-        println(getAllEventsStatistic())
+        for ((event, stat) in eventsStorage) {
+            println("$event: $stat")
+        }
     }
-
 }
