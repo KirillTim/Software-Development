@@ -8,22 +8,25 @@ import java.time.Duration
 import java.time.Instant
 
 import org.junit.Assert.assertEquals
+import org.mockito.Mockito.*
+import java.time.Clock
 
 class EventsStatisticTest {
 
     val DELTA = 1e-3
 
-    private var clock: SetableClock? = null
+    private var clock: Clock? = null
     private var statistic: EventsStatisticImpl? = null
 
     @Before
     fun setUp() {
-        clock = SetableClock(Instant.EPOCH)
+        clock = mock(Clock::class.java)
         statistic = EventsStatisticImpl(clock!!)
     }
 
     @Test
     fun testIncEvent() {
+        `when`(clock?.instant()).thenReturn(Instant.EPOCH)
         statistic!!.incEvent("a")
         statistic!!.incEvent("a")
         assertEquals(2.0 / 60, statistic!!.getEventStatistic("a"), DELTA)
@@ -31,20 +34,22 @@ class EventsStatisticTest {
 
     @Test
     fun testGetEventStatistic() {
+        `when`(clock?.instant()).thenReturn(Instant.EPOCH)
         statistic!!.incEvent("a")
-        clock!!.setNow(Instant.EPOCH.plus(Duration.ofMinutes(30)))
+        `when`(clock?.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofMinutes(30)))
         statistic!!.incEvent("b")
-        clock!!.setNow(Instant.EPOCH.plus(Duration.ofMinutes(61)))
+        `when`(clock?.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofMinutes(61)))
 
         assertEquals(0.0, statistic!!.getEventStatistic("a"), DELTA)
         assertEquals(1.0 / 60, statistic!!.getEventStatistic("b"), DELTA)
-        clock!!.setNow(Instant.EPOCH.plus(Duration.ofMinutes((30 + 61).toLong())))
+        `when`(clock?.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofMinutes((30 + 61).toLong())))
         assertEquals(0.0, statistic!!.getEventStatistic("b"), DELTA)
     }
 
     @Test
     @Throws(Exception::class)
     fun testGetAllEventStatistic() {
+        `when`(clock?.instant()).thenReturn(Instant.EPOCH)
         statistic!!.incEvent("a")
         statistic!!.incEvent("b")
         assertEquals(2.0 / 60, statistic!!.getAllEventStatistic(), DELTA)
@@ -53,9 +58,10 @@ class EventsStatisticTest {
     @Test
     @Throws(Exception::class)
     fun testExpiration() {
+        `when`(clock?.instant()).thenReturn(Instant.EPOCH)
         statistic!!.incEvent("a")
         assertEquals(1.0 / 60, statistic!!.getEventStatistic("a"), DELTA)
-        clock!!.setNow(Instant.EPOCH.plus(Duration.ofMinutes(61)))
+        `when`(clock?.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofMinutes(61)))
         assertEquals(0.0, statistic!!.getEventStatistic("a"), DELTA)
     }
 }

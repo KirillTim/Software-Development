@@ -1,8 +1,10 @@
 package im.kirillt.sd.clocktest
 
+import java.time.Clock
+
 
 fun main(args: Array<String>) {
-    val stat = EventsStatisticImpl(NormalClock())
+    val stat = EventsStatisticImpl(Clock.systemDefaultZone())
     stat.incEvent("a")
     stat.incEvent("a")
     stat.incEvent("b")
